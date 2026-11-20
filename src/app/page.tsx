@@ -290,7 +290,7 @@ export default function Home() {
         </div>
 
         <div className="mx-auto mt-10 max-w-7xl border-t border-white/10 px-5 pt-6 text-center text-sm text-gray-500">
-          © {new Date().getFullYear()} PizzaHub. All rights reserved.
+        © 2026 PizzaHub. All rights reserved.
         </div>
       </footer>
     </main>
