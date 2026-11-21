@@ -1,6 +1,7 @@
 
 "use client";
 
+import Image from "next/image";
 import { useEffect, useState } from "react";
 
 interface MenuItem {
@@ -192,7 +193,7 @@ export default function Page() {
                 className="rounded-xl bg-white p-5 shadow"
               >
                 {item.images?.[0] && (
-                  <img
+                  <Image
                     src={item.images[0]}
                     alt={item.itemName}
                     className="mb-4 h-48 w-full rounded-lg object-cover"
