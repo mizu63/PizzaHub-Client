@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -17,7 +17,7 @@ interface MenuItem {
   status: string;
 }
 
-export default function MenuDetailsPage() {
+function MenuDetailsContent() {
   const params = useParams();
   const router = useRouter();
 
@@ -159,5 +159,21 @@ export default function MenuDetailsPage() {
         </div>
       </div>
     </main>
+  );
+}
+
+export default function MenuDetailsPage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="flex min-h-screen items-center justify-center">
+          <p className="text-lg font-semibold text-gray-600">
+            Loading menu details...
+          </p>
+        </main>
+      }
+    >
+      <MenuDetailsContent />
+    </Suspense>
   );
 }
