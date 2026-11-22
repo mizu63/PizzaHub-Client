@@ -17,7 +17,7 @@ interface MenuItem {
 
 const getAuthToken = async (): Promise<string> => {
   const response = await fetch(
-    "http://localhost:5000/api/auth/get-session",
+  `${process.env.NEXT_PUBLIC_API_URL}/api/auth/get-session`,
     {
       method: "GET",
       credentials: "include",
@@ -48,7 +48,7 @@ export default function Page() {
       const token = await getAuthToken();
 
       const response = await fetch(
-        "http://localhost:5000/api/admin/menu",
+       `${process.env.NEXT_PUBLIC_API_URL}/api/admin/menu`,
         {
           method: "GET",
           headers: {
@@ -89,7 +89,7 @@ export default function Page() {
       const token = await getAuthToken();
 
       const response = await fetch(
-        `http://localhost:5000/api/admin/menu/${id}/status`,
+       `${process.env.NEXT_PUBLIC_API_URL}/api/admin/menu/${id}/status`,
         {
           method: "PATCH",
           headers: {

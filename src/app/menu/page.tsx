@@ -22,7 +22,7 @@ interface MenuResponse {
   data: MenuItem[];
 }
 
-const API_URL = "http://localhost:5000/api/menu";
+const API_URL = `${process.env.NEXT_PUBLIC_API_URL}/api/menu`;
 
 export default function MenuPage() {
   const [items, setItems] = useState<MenuItem[]>([]);

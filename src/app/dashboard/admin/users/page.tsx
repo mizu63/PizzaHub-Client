@@ -27,7 +27,7 @@ export default function AdminManageUsersPage() {
 
   const getAuthToken = async () => {
     const response = await fetch(
-      "http://localhost:5000/api/auth/get-session",
+    `${process.env.NEXT_PUBLIC_API_URL}/api/auth/get-session`,
       {
         credentials: "include",
         cache: "no-store",
@@ -52,7 +52,7 @@ export default function AdminManageUsersPage() {
     const token = await getAuthToken();
 
     const response = await fetch(
-      "http://localhost:5000/api/users",
+    `${process.env.NEXT_PUBLIC_API_URL}/api/users`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -89,7 +89,7 @@ export default function AdminManageUsersPage() {
       }
 
       const response = await fetch(
-        `http://localhost:5000/api/users?${params.toString()}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/users?${params.toString()}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -126,7 +126,7 @@ export default function AdminManageUsersPage() {
       const token = await getAuthToken();
 
       const response = await fetch(
-        `http://localhost:5000/api/users/${id}/block`,
+     `${process.env.NEXT_PUBLIC_API_URL}/api/users/${id}/block`,
         {
           method: "PATCH",
           headers: {

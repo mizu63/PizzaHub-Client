@@ -44,7 +44,7 @@ export default function Page() {
         throw new Error("Please sign in again.");
       }
 
-      const response = await fetch("http://localhost:5000/api/menu", {
+   const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/menu`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

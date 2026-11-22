@@ -17,7 +17,7 @@ interface DashboardStats {
 
 const getAuthToken = async (): Promise<string> => {
   const response = await fetch(
-    "http://localhost:5000/api/auth/get-session",
+  `${process.env.NEXT_PUBLIC_API_URL}/api/auth/get-session`,
     {
       method: "GET",
       credentials: "include",
@@ -47,7 +47,7 @@ export default function Page() {
       const token = await getAuthToken();
 
       const response = await fetch(
-        "http://localhost:5000/api/admin/stats",
+       `${process.env.NEXT_PUBLIC_API_URL}/api/admin/stats`,
         {
           method: "GET",
           headers: {

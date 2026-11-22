@@ -32,7 +32,7 @@ function MenuDetailsContent() {
     const fetchMenuItem = async () => {
       try {
         const response = await fetch(
-          `http://localhost:5000/api/menu/${params.id}`
+         `${process.env.NEXT_PUBLIC_API_URL}/api/menu/${params.id}`
         );
 
         const result = await response.json();

@@ -20,7 +20,7 @@ export default function SignInPage() {
 
     try {
       const response = await fetch(
-        "http://localhost:5000/api/auth/sign-in/email",
+       `${process.env.NEXT_PUBLIC_API_URL}/api/auth/sign-in/email`,
         {
           method: "POST",
           headers: {

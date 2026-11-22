@@ -3,8 +3,9 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
-const API_URL = "http://localhost:5000";
+const API_URL = process.env.NEXT_PUBLIC_API_URL!;
 
 interface MenuItem {
   _id: string;
@@ -602,7 +603,7 @@ export default function VendorMenuPage() {
               >
                 <div className="relative h-56 overflow-hidden bg-orange-50">
                   {item.images?.[0] ? (
-                    <img
+                    <Image
                       src={item.images[0]}
                       alt={item.itemName}
                       className="h-full w-full object-cover transition duration-500 group-hover:scale-105"

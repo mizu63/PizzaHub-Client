@@ -31,7 +31,7 @@ export default function AdminTransactionsPage() {
       setError("");
 
       const sessionResponse = await fetch(
-        "http://localhost:5000/api/auth/get-session",
+      `${process.env.NEXT_PUBLIC_API_URL}/api/auth/get-session`,
         {
           credentials: "include",
           cache: "no-store",
@@ -49,7 +49,7 @@ export default function AdminTransactionsPage() {
       }
 
       const response = await fetch(
-        "http://localhost:5000/api/admin/transactions",
+       `${process.env.NEXT_PUBLIC_API_URL}/api/admin/transactions`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
