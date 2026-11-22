@@ -32,34 +32,6 @@ const features = [
 export default function Home() {
   return (
     <main className="min-h-screen bg-[#fffaf4] text-[#29211d]">
-      {/* Navbar */}
-      <header className="sticky top-0 z-50 border-b border-orange-100 bg-white/95 backdrop-blur">
-        <nav className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 lg:px-8">
-          <Link href="/" className="text-2xl font-black text-[#d93824]">
-            🍕 PizzaHub
-          </Link>
-
-          <div className="hidden items-center gap-8 text-sm font-semibold md:flex">
-            <Link href="/" className="text-[#d93824]">Home</Link>
-            <Link href="/menu" className="hover:text-[#d93824]">Browse Menu</Link>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <Link
-              href="/sign-in"
-              className="rounded-full px-4 py-2 text-sm font-bold hover:text-[#d93824]"
-            >
-              Sign In
-            </Link>
-            <Link
-              href="/sign-up"
-              className="rounded-full bg-[#d93824] px-5 py-2.5 text-sm font-bold text-white transition hover:bg-[#b92d1c]"
-            >
-              Get Started
-            </Link>
-          </div>
-        </nav>
-      </header>
 
       {/* Hero */}
       <section className="mx-auto grid max-w-7xl items-center gap-12 px-5 py-20 md:grid-cols-2 lg:px-8 lg:py-28">
@@ -244,9 +216,21 @@ export default function Home() {
 
         <div className="mt-12 grid gap-10 text-center md:grid-cols-3">
           {[
-            { number: "01", title: "Explore", text: "Discover pizzas from local restaurants." },
-            { number: "02", title: "Choose", text: "Find your favorite pizza and place an order." },
-            { number: "03", title: "Enjoy", text: "Get ready to enjoy your delicious pizza." },
+            {
+              number: "01",
+              title: "Explore",
+              text: "Discover pizzas from local restaurants.",
+            },
+            {
+              number: "02",
+              title: "Choose",
+              text: "Find your favorite pizza and place an order.",
+            },
+            {
+              number: "03",
+              title: "Enjoy",
+              text: "Get ready to enjoy your delicious pizza.",
+            },
           ].map((step) => (
             <div key={step.number}>
               <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[#d93824] text-xl font-black text-white">
@@ -290,7 +274,7 @@ export default function Home() {
         </div>
 
         <div className="mx-auto mt-10 max-w-7xl border-t border-white/10 px-5 pt-6 text-center text-sm text-gray-500">
-        © 2026 PizzaHub. All rights reserved.
+          © 2026 PizzaHub. All rights reserved.
         </div>
       </footer>
     </main>

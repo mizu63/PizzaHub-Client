@@ -106,158 +106,289 @@ export default function AdminTransactionsPage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-[60vh] items-center justify-center">
-        <div className="h-10 w-10 animate-spin rounded-full border-4 border-green-600 border-t-transparent" />
+      <div className="flex min-h-[60vh] items-center justify-center bg-[#fffaf5]">
+        <div className="text-center">
+          <div className="mx-auto h-12 w-12 animate-spin rounded-full border-4 border-orange-100 border-t-[#d93824]" />
+          <p className="mt-4 text-sm font-semibold text-gray-500">
+            Loading transaction records...
+          </p>
+        </div>
       </div>
     );
   }
 
+  const summaryCards = [
+    {
+      title: "Total Transactions",
+      value: transactions.length.toLocaleString(),
+      icon: "📋",
+      color: "text-blue-600",
+      bg: "bg-blue-50",
+    },
+    {
+      title: "Completed",
+      value: completedTransactions.length.toLocaleString(),
+      icon: "✓",
+      color: "text-green-600",
+      bg: "bg-green-50",
+    },
+    {
+      title: "Cancelled",
+      value: cancelledTransactions.length.toLocaleString(),
+      icon: "✕",
+      color: "text-red-600",
+      bg: "bg-red-50",
+    },
+    {
+      title: "Total Revenue",
+      value: totalRevenue.toFixed(2),
+      icon: "💰",
+      color: "text-orange-600",
+      bg: "bg-orange-50",
+    },
+  ];
+
   return (
-    <div className="space-y-8">
-      <div className="flex flex-wrap items-center justify-between gap-4">
+    <main className="min-h-screen space-y-8 bg-[#fffaf5] p-4 sm:p-6 lg:p-8">
+      <section className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-[#a92318] via-[#d93824] to-[#f07827] p-7 text-white shadow-xl shadow-orange-200/40 sm:p-10">
+        <div className="absolute -right-16 -top-20 h-72 w-72 rounded-full border-[35px] border-white/10" />
+        <div className="absolute -bottom-24 right-40 h-64 w-64 rounded-full bg-white/10 blur-3xl" />
+
+        <div className="relative z-10 flex flex-col justify-between gap-6 sm:flex-row sm:items-center">
+          <div>
+            <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/15 px-4 py-2 text-xs font-bold uppercase tracking-[0.18em]">
+              💳 Financial Management
+            </span>
+
+            <h1 className="mt-6 text-3xl font-black tracking-tight sm:text-4xl">
+              Manage Transactions
+            </h1>
+
+            <p className="mt-3 max-w-xl text-sm leading-7 text-white/85 sm:text-base">
+              Monitor vendor subscription payments and review all
+              transaction records across your PizzaHub platform.
+            </p>
+          </div>
+
+          <div className="hidden h-32 w-32 shrink-0 items-center justify-center rounded-[2rem] border border-white/20 bg-white/10 text-6xl backdrop-blur-sm lg:flex">
+            💰
+          </div>
+        </div>
+      </section>
+
+      <section className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">
-            Manage Transactions
-          </h1>
-          <p className="mt-2 text-gray-500">
-            View all vendor subscription payments and transactions.
+          <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#d93824]">
+            Financial Overview
+          </p>
+          <h2 className="mt-2 text-2xl font-black text-gray-900">
+            Transaction Statistics
+          </h2>
+          <p className="mt-2 text-sm text-gray-500">
+            A summary of your subscription payment activity.
           </p>
         </div>
 
         <button
           onClick={fetchTransactions}
-          className="rounded-lg bg-green-600 px-5 py-2.5 font-semibold text-white transition hover:bg-green-700"
+          className="inline-flex items-center gap-2 rounded-xl bg-[#d93824] px-5 py-3 text-sm font-bold text-white shadow-lg shadow-red-200/50 transition hover:-translate-y-0.5 hover:bg-[#b92d1c]"
         >
-          Refresh
+          <span>↻</span>
+          Refresh Records
         </button>
-      </div>
+      </section>
 
       {error && (
-        <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-red-600">
-          {error}
+        <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-red-200 bg-red-50 p-5 text-sm text-red-700">
+          <p>{error}</p>
           <button
             onClick={fetchTransactions}
-            className="ml-3 font-semibold underline"
+            className="rounded-lg bg-red-600 px-4 py-2 font-bold text-white transition hover:bg-red-700"
           >
             Try Again
           </button>
         </div>
       )}
 
-      <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
-        <div className="rounded-xl border bg-white p-6 shadow-sm">
-          <p className="text-sm text-gray-500">Total Transactions</p>
-          <h2 className="mt-3 text-3xl font-bold text-gray-900">
-            {transactions.length}
-          </h2>
-        </div>
+      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        {summaryCards.map((card) => (
+          <div
+            key={card.title}
+            className="rounded-2xl border border-orange-100 bg-white p-5 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg"
+          >
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-sm font-semibold text-gray-500">
+                {card.title}
+              </p>
 
-        <div className="rounded-xl border bg-white p-6 shadow-sm">
-          <p className="text-sm text-gray-500">Completed Transactions</p>
-          <h2 className="mt-3 text-3xl font-bold text-green-600">
-            {completedTransactions.length}
-          </h2>
-        </div>
+              <div
+                className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl text-xl ${card.bg}`}
+              >
+                {card.icon}
+              </div>
+            </div>
 
-        <div className="rounded-xl border bg-white p-6 shadow-sm">
-          <p className="text-sm text-gray-500">Cancelled Transactions</p>
-          <h2 className="mt-3 text-3xl font-bold text-red-600">
-            {cancelledTransactions.length}
-          </h2>
-        </div>
+            <h3 className={`mt-5 text-3xl font-black ${card.color}`}>
+              {card.value}
+              {card.title === "Total Revenue" && (
+                <span className="ml-1 text-sm font-bold">USD</span>
+              )}
+            </h3>
 
-        <div className="rounded-xl border bg-white p-6 shadow-sm">
-          <p className="text-sm text-gray-500">Total Revenue</p>
-          <h2 className="mt-3 text-3xl font-bold text-green-600">
-            {totalRevenue.toFixed(2)}
-          </h2>
-          <p className="mt-1 text-xs text-gray-400">
-            Sum of completed transactions
-          </p>
-        </div>
-      </div>
+            <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-gray-100">
+              <div className="h-full w-2/3 rounded-full bg-gradient-to-r from-orange-400 to-[#d93824]" />
+            </div>
+          </div>
+        ))}
+      </section>
 
-      <div className="overflow-hidden rounded-xl border bg-white shadow-sm">
-        <div className="border-b p-5">
-          <h2 className="text-xl font-bold text-gray-900">
-            All Transactions
-          </h2>
-          <p className="mt-1 text-sm text-gray-500">
-            Subscription payment history
-          </p>
+      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#a92318] to-[#ed642b] p-7 text-white shadow-lg shadow-orange-200/40 sm:p-9">
+        <div className="absolute -right-12 -top-16 h-52 w-52 rounded-full bg-white/10 blur-2xl" />
+
+        <div className="relative z-10 flex flex-col justify-between gap-5 sm:flex-row sm:items-center">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-orange-100">
+              Premium Subscription Earnings
+            </p>
+
+            <h2 className="mt-3 text-2xl font-black sm:text-3xl">
+              Total Revenue
+            </h2>
+
+            <p className="mt-2 text-sm text-white/80">
+              Sum of completed subscription transactions
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-white/20 bg-white/10 px-6 py-5 backdrop-blur-sm">
+            <p className="text-xs font-bold uppercase tracking-wider text-orange-100">
+              Total Earnings
+            </p>
+
+            <p className="mt-2 text-3xl font-black sm:text-4xl">
+              {totalRevenue.toFixed(2)}
+            </p>
+            <p className="mt-1 text-xs font-semibold text-white/75">
+              Transaction amount total
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section className="overflow-hidden rounded-3xl border border-orange-100 bg-white shadow-sm">
+        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-orange-100 p-6 sm:p-7">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#d93824]">
+              Payment History
+            </p>
+
+            <h2 className="mt-2 text-xl font-black text-gray-900 sm:text-2xl">
+              All Transactions
+            </h2>
+
+            <p className="mt-2 text-sm text-gray-500">
+              Vendor subscription payment records
+            </p>
+          </div>
+
+          <div className="rounded-xl bg-orange-50 px-4 py-3">
+            <p className="text-xs font-semibold text-gray-500">
+              Total Records
+            </p>
+            <p className="mt-1 text-xl font-black text-[#d93824]">
+              {transactions.length}
+            </p>
+          </div>
         </div>
 
         {transactions.length === 0 ? (
-          <div className="p-12 text-center">
-            <h3 className="text-lg font-semibold text-gray-700">
+          <div className="px-6 py-16 text-center sm:py-20">
+            <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-3xl bg-orange-50 text-4xl">
+              💳
+            </div>
+
+            <h3 className="mt-6 text-xl font-black text-gray-800">
               No Transactions Found
             </h3>
-            <p className="mt-2 text-sm text-gray-500">
-              Vendor subscription transactions will appear here.
+
+            <p className="mx-auto mt-2 max-w-md text-sm leading-7 text-gray-500">
+              Vendor subscription transactions will appear here when
+              payment records become available.
             </p>
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[1000px] text-left text-sm">
-              <thead className="bg-gray-50 text-gray-600">
+            <table className="w-full min-w-[1050px] text-left text-sm">
+              <thead className="bg-[#fff7f0] text-xs uppercase tracking-wider text-gray-500">
                 <tr>
-                  <th className="px-5 py-4">Vendor</th>
-                  <th className="px-5 py-4">Business</th>
-                  <th className="px-5 py-4">Plan</th>
-                  <th className="px-5 py-4">Amount</th>
-                  <th className="px-5 py-4">Status</th>
-                  <th className="px-5 py-4">Transaction Date</th>
-                  <th className="px-5 py-4">Transaction ID</th>
+                  <th className="px-6 py-5 font-bold">Vendor</th>
+                  <th className="px-6 py-5 font-bold">Business</th>
+                  <th className="px-6 py-5 font-bold">Plan</th>
+                  <th className="px-6 py-5 font-bold">Amount</th>
+                  <th className="px-6 py-5 font-bold">Status</th>
+                  <th className="px-6 py-5 font-bold">Transaction Date</th>
+                  <th className="px-6 py-5 font-bold">Transaction ID</th>
                 </tr>
               </thead>
 
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-orange-50">
                 {transactions.map((transaction) => (
                   <tr
                     key={transaction._id}
-                    className="transition hover:bg-gray-50"
+                    className="transition-colors hover:bg-orange-50/50"
                   >
-                    <td className="px-5 py-4">
-                      <p className="font-semibold text-gray-900">
-                        {transaction.vendor?.name || "Unknown Vendor"}
-                      </p>
-                      <p className="mt-1 text-xs text-gray-500">
-                        {transaction.vendor?.email || "N/A"}
-                      </p>
+                    <td className="px-6 py-5">
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-100 font-black text-[#d93824]">
+                          {(transaction.vendor?.name || "U")
+                            .charAt(0)
+                            .toUpperCase()}
+                        </div>
+
+                        <div>
+                          <p className="font-bold text-gray-900">
+                            {transaction.vendor?.name || "Unknown Vendor"}
+                          </p>
+                          <p className="mt-1 text-xs text-gray-500">
+                            {transaction.vendor?.email || "N/A"}
+                          </p>
+                        </div>
+                      </div>
                     </td>
 
-                    <td className="px-5 py-4 text-gray-700">
+                    <td className="px-6 py-5 font-medium text-gray-700">
                       {transaction.vendor?.businessName || "N/A"}
                     </td>
 
-                    <td className="px-5 py-4">
-                      <span className="rounded-full bg-purple-100 px-3 py-1 text-xs font-semibold capitalize text-purple-700">
+                    <td className="px-6 py-5">
+                      <span className="inline-flex rounded-full border border-purple-100 bg-purple-50 px-3 py-1.5 text-xs font-bold capitalize text-purple-700">
                         {transaction.plan}
                       </span>
                     </td>
 
-                    <td className="px-5 py-4 font-semibold text-gray-900">
+                    <td className="px-6 py-5 font-black text-gray-900">
                       {formatAmount(
                         transaction.amount,
                         transaction.currency
                       )}
                     </td>
 
-                    <td className="px-5 py-4">
+                    <td className="px-6 py-5">
                       <span
-                        className={`rounded-full px-3 py-1 text-xs font-semibold capitalize ${
+                        className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold capitalize ${
                           transaction.status === "completed"
-                            ? "bg-green-100 text-green-700"
+                            ? "bg-green-50 text-green-700"
                             : transaction.status === "cancelled"
-                              ? "bg-red-100 text-red-700"
-                              : "bg-yellow-100 text-yellow-700"
+                              ? "bg-red-50 text-red-700"
+                              : "bg-amber-50 text-amber-700"
                         }`}
                       >
+                        <span className="h-1.5 w-1.5 rounded-full bg-current" />
                         {transaction.status}
                       </span>
                     </td>
 
-                    <td className="px-5 py-4 text-gray-600">
+                    <td className="px-6 py-5 font-medium text-gray-600">
                       {new Date(
                         transaction.createdAt
                       ).toLocaleDateString("en-US", {
@@ -267,10 +398,15 @@ export default function AdminTransactionsPage() {
                       })}
                     </td>
 
-                    <td className="px-5 py-4 text-xs text-gray-500">
-                      {transaction.stripeSessionId
-                        ? `${transaction.stripeSessionId.slice(0, 18)}...`
-                        : "N/A"}
+                    <td className="px-6 py-5">
+                      <span
+                        className="rounded-lg bg-gray-50 px-3 py-2 font-mono text-xs text-gray-500"
+                        title={transaction.stripeSessionId || "N/A"}
+                      >
+                        {transaction.stripeSessionId
+                          ? `${transaction.stripeSessionId.slice(0, 18)}...`
+                          : "N/A"}
+                      </span>
                     </td>
                   </tr>
                 ))}
@@ -278,11 +414,23 @@ export default function AdminTransactionsPage() {
             </table>
           </div>
         )}
+      </section>
+
+      <div className="rounded-2xl border border-orange-100 bg-white px-5 py-4">
+        <p className="flex items-start gap-3 text-xs leading-6 text-gray-500 sm:text-sm">
+          <span className="text-lg">🔒</span>
+          <span>
+            Admin can view transaction records only. Payments cannot be
+            edited or deleted here.
+          </span>
+        </p>
       </div>
 
-      <p className="text-sm text-gray-500">
-        Admin can view transaction records only. Payments cannot be edited or deleted here.
-      </p>
-    </div>
+      <div className="pb-5 text-center">
+        <p className="text-xs font-medium tracking-wider text-gray-400">
+          PIZZAHUB ADMIN FINANCIAL MANAGEMENT
+        </p>
+      </div>
+    </main>
   );
 }
