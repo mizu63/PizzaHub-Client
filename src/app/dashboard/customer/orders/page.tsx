@@ -35,6 +35,7 @@ export default function CustomerOrdersPage() {
   // Order form states
   const [menuId, setMenuId] = useState("");
   const [deliveryDate, setDeliveryDate] = useState("");
+  const [minDate, setMinDate] = useState("");
   const [deliveryAddress, setDeliveryAddress] = useState("");
   const [message, setMessage] = useState("");
   const [placingOrder, setPlacingOrder] = useState(false);
@@ -42,6 +43,23 @@ export default function CustomerOrdersPage() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     setMenuId(params.get("menuId") || "");
+  }, []);
+
+  // Set minimum delivery date after the component mounts
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      const today = new Date();
+
+      const formattedDate = new Date(
+        today.getTime() - today.getTimezoneOffset() * 60000
+      )
+        .toISOString()
+        .split("T")[0];
+
+      setMinDate(formattedDate);
+    }, 0);
+
+    return () => window.clearTimeout(timer);
   }, []);
 
   const getToken = async () => {
@@ -239,13 +257,6 @@ export default function CustomerOrdersPage() {
   const cancelledCount = orders.filter(
     (order) => order.status === "cancelled"
   ).length;
-
-  const today = new Date();
-  const minDate = new Date(
-    today.getTime() - today.getTimezoneOffset() * 60000
-  )
-    .toISOString()
-    .split("T")[0];
 
   return (
     <main className="min-h-screen bg-[#fffaf5] px-4 py-10 sm:px-6 lg:py-14">
