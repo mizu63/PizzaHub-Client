@@ -46,6 +46,7 @@ export default function VendorMenuPage() {
   const [success, setSuccess] = useState("");
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("all");
+  const [sortOrder, setSortOrder] = useState("default");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<MenuForm>(initialForm);
   const [saving, setSaving] = useState(false);
@@ -110,17 +111,38 @@ export default function VendorMenuPage() {
     fetchItems();
   }, [fetchItems]);
 
-  const filteredItems = items.filter((item) => {
-    const matchesSearch =
-      item.itemName.toLowerCase().includes(search.toLowerCase()) ||
-      item.category.toLowerCase().includes(search.toLowerCase()) ||
-      item.location.toLowerCase().includes(search.toLowerCase());
+  // Search, Status Filter and Price Sorting
+  const filteredItems = items
+    .filter((item) => {
+      const searchTerm = search.trim().toLowerCase();
 
-    const matchesStatus =
-      filter === "all" || item.status === filter;
+      const matchesSearch =
+        item.itemName.toLowerCase().includes(searchTerm) ||
+        item.category.toLowerCase().includes(searchTerm) ||
+        item.location.toLowerCase().includes(searchTerm);
 
-    return matchesSearch && matchesStatus;
-  });
+      const matchesStatus =
+        filter === "all" || item.status === filter;
+
+      return matchesSearch && matchesStatus;
+    })
+    .sort((a, b) => {
+      if (sortOrder === "low-to-high") {
+        return a.price - b.price;
+      }
+
+      if (sortOrder === "high-to-low") {
+        return b.price - a.price;
+      }
+
+      return 0;
+    });
+
+  const clearFilters = () => {
+    setSearch("");
+    setFilter("all");
+    setSortOrder("default");
+  };
 
   const handleEdit = (item: MenuItem) => {
     setEditingId(item._id);
@@ -139,7 +161,9 @@ export default function VendorMenuPage() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const handleUpdate = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleUpdate = async (
+    e: React.FormEvent<HTMLFormElement>
+  ) => {
     e.preventDefault();
 
     if (!editingId) return;
@@ -520,9 +544,9 @@ export default function VendorMenuPage() {
           </section>
         )}
 
-        {/* Search and Filter */}
+        {/* Search, Status Filter and Price Sorting */}
         <section className="mb-7 rounded-2xl border border-orange-100 bg-white p-5 shadow-sm">
-          <div className="grid gap-4 md:grid-cols-[1fr_220px]">
+          <div className="grid gap-4 md:grid-cols-3">
             <input
               type="text"
               value={search}
@@ -542,6 +566,30 @@ export default function VendorMenuPage() {
               <option value="rejected">Rejected</option>
               <option value="inactive">Inactive</option>
             </select>
+
+            <select
+              value={sortOrder}
+              onChange={(e) => setSortOrder(e.target.value)}
+              className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-semibold text-gray-700 outline-none focus:border-[#d93824]"
+            >
+              <option value="default">Default Order</option>
+              <option value="low-to-high">Price: Low to High</option>
+              <option value="high-to-low">Price: High to Low</option>
+            </select>
+          </div>
+
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+            <p className="text-xs font-medium text-gray-500">
+              Showing {filteredItems.length} of {items.length} menu items
+            </p>
+
+            <button
+              type="button"
+              onClick={clearFilters}
+              className="text-sm font-bold text-[#d93824] transition hover:text-[#b92d1c]"
+            >
+              Clear Filters
+            </button>
           </div>
         </section>
 
@@ -554,6 +602,22 @@ export default function VendorMenuPage() {
                 Loading your menu items...
               </p>
             </div>
+          </div>
+        ) : error && items.length === 0 ? (
+          <div className="rounded-3xl border border-red-100 bg-white px-6 py-16 text-center shadow-sm">
+            <h2 className="text-2xl font-black text-gray-900">
+              Unable to Load Menu Items
+            </h2>
+            <p className="mt-3 text-sm text-gray-500">
+              Please check your connection and try again.
+            </p>
+            <button
+              type="button"
+              onClick={fetchItems}
+              className="mt-6 rounded-xl bg-[#d93824] px-6 py-3 text-sm font-bold text-white hover:bg-[#b92d1c]"
+            >
+              Try Again
+            </button>
           </div>
         ) : filteredItems.length === 0 ? (
           /* Empty State */
@@ -583,10 +647,7 @@ export default function VendorMenuPage() {
               </Link>
             ) : (
               <button
-                onClick={() => {
-                  setSearch("");
-                  setFilter("all");
-                }}
+                onClick={clearFilters}
                 className="mt-7 rounded-xl border border-orange-200 px-6 py-3 text-sm font-bold text-[#d93824] transition hover:bg-orange-50"
               >
                 Clear Filters
@@ -606,7 +667,9 @@ export default function VendorMenuPage() {
                     <Image
                       src={item.images[0]}
                       alt={item.itemName}
-                      className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                      fill
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                      className="object-cover transition duration-500 group-hover:scale-105"
                     />
                   ) : (
                     <div className="flex h-full items-center justify-center text-6xl">

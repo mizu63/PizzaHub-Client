@@ -2,22 +2,20 @@
 "use client";
 
 import { useState, FormEvent } from "react";
-import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
 
 export default function Page() {
-  const router = useRouter();
-
   const [formData, setFormData] = useState({
     itemName: "",
     category: "",
     description: "",
     location: "",
     price: "",
-    image: "",
   });
 
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [message, setMessage] = useState("");
 
   const handleChange = (
@@ -31,12 +29,95 @@ export default function Page() {
     });
   };
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+  // Image Selection
+  const handleImageChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = e.target.files?.[0];
+
+    if (!file) {
+      setSelectedImage(null);
+      return;
+    }
+
+    const allowedTypes = [
+      "image/jpeg",
+      "image/png",
+      "image/webp",
+    ];
+
+    if (!allowedTypes.includes(file.type)) {
+      setMessage("Only JPG, PNG and WEBP images are allowed.");
+      e.target.value = "";
+      setSelectedImage(null);
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      setMessage("Image size must be less than 5 MB.");
+      e.target.value = "";
+      setSelectedImage(null);
+      return;
+    }
+
+    setMessage("");
+    setSelectedImage(file);
+  };
+
+  // Upload Image to ImgBB
+  const uploadImage = async (): Promise<string> => {
+    if (!selectedImage) {
+      throw new Error("Please select a food image.");
+    }
+
+    const apiKey = process.env.NEXT_PUBLIC_IMGBB_API_KEY;
+
+    if (!apiKey) {
+      throw new Error("ImgBB API key is missing.");
+    }
+
+    const imageData = new FormData();
+    imageData.append("image", selectedImage);
+
+    const response = await fetch(
+      `https://api.imgbb.com/1/upload?key=${apiKey}`,
+      {
+        method: "POST",
+        body: imageData,
+      }
+    );
+
+    const result = await response.json();
+
+    if (!response.ok || !result.success || !result.data?.url) {
+      throw new Error(
+        result.error?.message || "Image upload failed."
+      );
+    }
+
+    return result.data.url;
+  };
+
+  // Submit Menu Item
+  const handleSubmit = async (
+    e: FormEvent<HTMLFormElement>
+  ) => {
     e.preventDefault();
+
     setLoading(true);
     setMessage("");
 
     try {
+      if (!selectedImage) {
+        throw new Error("Please select a food image.");
+      }
+
+      // Upload Image
+      setUploading(true);
+      const imageUrl = await uploadImage();
+      setUploading(false);
+
+      // Get Authentication Token
       const { data: tokenData, error: tokenError } =
         await authClient.token();
 
@@ -44,27 +125,33 @@ export default function Page() {
         throw new Error("Please sign in again.");
       }
 
-   const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/menu`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${tokenData.token}`,
-        },
-        credentials: "include",
-        body: JSON.stringify({
-          itemName: formData.itemName,
-          category: formData.category,
-          description: formData.description,
-          location: formData.location,
-          price: Number(formData.price),
-          images: [formData.image],
-        }),
-      });
+      // Save Menu Item
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/menu`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${tokenData.token}`,
+          },
+          credentials: "include",
+          body: JSON.stringify({
+            itemName: formData.itemName,
+            category: formData.category,
+            description: formData.description,
+            location: formData.location,
+            price: Number(formData.price),
+            images: [imageUrl],
+          }),
+        }
+      );
 
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.message || "Failed to add menu item");
+        throw new Error(
+          result.message || "Failed to add menu item."
+        );
       }
 
       setMessage(
@@ -77,14 +164,27 @@ export default function Page() {
         description: "",
         location: "",
         price: "",
-        image: "",
       });
+
+      setSelectedImage(null);
+
+      // Reset file input
+      const fileInput = document.getElementById(
+        "foodImage"
+      ) as HTMLInputElement | null;
+
+      if (fileInput) {
+        fileInput.value = "";
+      }
     } catch (error) {
       setMessage(
-        error instanceof Error ? error.message : "Something went wrong"
+        error instanceof Error
+          ? error.message
+          : "Something went wrong."
       );
     } finally {
       setLoading(false);
+      setUploading(false);
     }
   };
 
@@ -148,18 +248,23 @@ export default function Page() {
             <h2 className="text-xl font-extrabold text-gray-900">
               Menu Item Information
             </h2>
+
             <p className="mt-1 text-sm text-gray-500">
               Fill in the details of your new menu item.
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6 p-6 sm:p-9">
+          <form
+            onSubmit={handleSubmit}
+            className="space-y-6 p-6 sm:p-9"
+          >
 
             {/* Item Name */}
             <div>
               <label className={labelClass}>
                 Item Name
               </label>
+
               <input
                 type="text"
                 name="itemName"
@@ -176,6 +281,7 @@ export default function Page() {
               <label className={labelClass}>
                 Category
               </label>
+
               <input
                 type="text"
                 name="category"
@@ -192,6 +298,7 @@ export default function Page() {
               <label className={labelClass}>
                 Description
               </label>
+
               <textarea
                 name="description"
                 value={formData.description}
@@ -201,6 +308,7 @@ export default function Page() {
                 required
                 className={`${inputClass} resize-y`}
               />
+
               <p className="mt-2 text-xs text-gray-400">
                 Tell customers what makes this item special.
               </p>
@@ -212,6 +320,7 @@ export default function Page() {
                 <label className={labelClass}>
                   Location
                 </label>
+
                 <input
                   type="text"
                   name="location"
@@ -227,6 +336,7 @@ export default function Page() {
                 <label className={labelClass}>
                   Price (৳)
                 </label>
+
                 <input
                   type="number"
                   name="price"
@@ -240,23 +350,33 @@ export default function Page() {
               </div>
             </div>
 
-            {/* Image URL */}
+            {/* Food Image Upload */}
             <div>
-              <label className={labelClass}>
-                Food Image URL
+              <label
+                htmlFor="foodImage"
+                className={labelClass}
+              >
+                Food Image
               </label>
+
               <input
-                type="url"
-                name="image"
-                value={formData.image}
-                onChange={handleChange}
-                placeholder="https://example.com/pizza.jpg"
+                id="foodImage"
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                onChange={handleImageChange}
                 required
                 className={inputClass}
               />
+
               <p className="mt-2 text-xs text-gray-400">
-                Add a valid image URL to showcase your food.
+                Upload JPG, PNG or WEBP image. Maximum size 5 MB.
               </p>
+
+              {selectedImage && (
+                <p className="mt-2 text-sm font-medium text-green-600">
+                  Selected: {selectedImage.name}
+                </p>
+              )}
             </div>
 
             {/* Message */}
@@ -273,6 +393,7 @@ export default function Page() {
                     ? "✓"
                     : "⚠"}
                 </span>
+
                 {message}
               </div>
             )}
@@ -287,7 +408,9 @@ export default function Page() {
                 {loading ? (
                   <>
                     <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />
-                    Submitting...
+                    {uploading
+                      ? "Uploading Image..."
+                      : "Submitting..."}
                   </>
                 ) : (
                   <>
