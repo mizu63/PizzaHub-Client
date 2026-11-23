@@ -20,7 +20,7 @@ export default function SignInPage() {
 
     try {
       const response = await fetch(
-       `${process.env.NEXT_PUBLIC_API_URL}/api/auth/sign-in/email`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/sign-in/email`,
         {
           method: "POST",
           headers: {
@@ -42,7 +42,19 @@ export default function SignInPage() {
         );
       }
 
-      router.push("/dashboard");
+      // Get redirect URL after successful login
+      const params = new URLSearchParams(window.location.search);
+      const redirectTo = params.get("redirect");
+
+      // Allow only safe internal paths
+      const safeRedirect =
+        redirectTo &&
+        redirectTo.startsWith("/") &&
+        !redirectTo.startsWith("//")
+          ? redirectTo
+          : "/dashboard";
+
+      router.push(safeRedirect);
       router.refresh();
     } catch (err) {
       setError(

@@ -32,7 +32,7 @@ function MenuDetailsContent() {
     const fetchMenuItem = async () => {
       try {
         const response = await fetch(
-         `${process.env.NEXT_PUBLIC_API_URL}/api/menu/${params.id}`
+          `${process.env.NEXT_PUBLIC_API_URL}/api/menu/${params.id}`
         );
 
         const result = await response.json();
@@ -59,14 +59,24 @@ function MenuDetailsContent() {
   }, [params.id]);
 
   const handleOrderNow = () => {
-    if (isPending) return;
+    if (isPending || !item) return;
 
+    const orderUrl = `/dashboard/customer/orders?menuId=${encodeURIComponent(item._id)}`;
+
+    // If user is not logged in, redirect to sign in first
     if (!session?.user) {
-      router.push("/sign-in");
+      router.push(`/sign-in?redirect=${encodeURIComponent(orderUrl)}`);
       return;
     }
 
-    router.push(`/dashboard/customer/orders?menuId=${item?._id}`);
+    // Only customers can place orders
+    if (session.user.role !== "customer") {
+      alert("Only customers can place orders.");
+      return;
+    }
+
+    // Go directly to the order form
+    router.push(orderUrl);
   };
 
   if (loading) {
